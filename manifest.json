@@ -2,9 +2,23 @@
   "manifest_version": 3,
   "name": "Auto Anki",
   "version": "0.1.0",
-  "description": "Google \"word meaning\" and the word lands in Anki as a flashcard.",
-  "permissions": ["webNavigation", "storage", "alarms"],
-  "host_permissions": ["https://api.dictionaryapi.dev/*", "http://127.0.0.1:8765/*"],
-  "background": { "service_worker": "background.js", "type": "module" },
-  "action": { "default_title": "Auto Anki" }
+  "description": "Google \"word meaning\" and Auto Anki offers to add the word to Anki as a flashcard.",
+  "permissions": [
+    "webNavigation",
+    "scripting",
+    "storage",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://www.google.com/*",
+    "https://en.wiktionary.org/*",
+    "http://127.0.0.1:8765/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Auto Anki"
+  }
 }

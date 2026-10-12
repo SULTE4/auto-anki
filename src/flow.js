@@ -1,7 +1,8 @@
 import { extractWord } from './parse.js';
 import { lookup } from './dictionary.js';
 import { renderBack } from './card.js';
-import { addWord, sync } from './anki.js';
+import { addWord, sync, AnkiError } from './anki.js';
+import { showToast } from './toast.js';
 
 export const DECK = 'Auto Anki';
 const RECENT_MS = 10 * 60 * 1000;
@@ -14,15 +15,30 @@ function badge(text, color, title) {
   chrome.action.setTitle({ title });
 }
 
-// Returns 'added' | 'duplicate' | 'not-found' | 'queued', or undefined when the URL is ignored.
-export async function handleUrl(url) {
+// Shows the "Add to Anki?" card in the tab. Returns 'asked' | 'not-found', or undefined when the URL is ignored.
+export async function handleUrl(url, tabId) {
   const word = extractWord(url);
   if (!word || Date.now() - (recent.get(word) ?? -Infinity) < RECENT_MS) return;
   recent.set(word, Date.now());
   await flushPending();
-  return processWord(word);
+  // Dictionary down: still ask without a preview; the add retries the lookup and queues on failure.
+  const entry = await lookup(word).catch(() => undefined);
+  if (entry === null) {
+    badge('?', '#f9a825', `No definition found: ${word}`);
+    return 'not-found';
+  }
+  const preview = entry ? { partOfSpeech: entry.senses[0].partOfSpeech, definition: entry.senses[0].definition } : null;
+  await chrome.scripting.executeScript({ target: { tabId }, func: showToast, args: [word, preview] });
+  return 'asked';
 }
 
+// The card's Add button. Returns the status for the card, or undefined for messages that aren't ours.
+export function onMessage(msg) {
+  if (msg?.type !== 'auto-anki:add' || typeof msg.word !== 'string' || !msg.word.trim()) return;
+  return processWord(msg.word.trim().toLowerCase());
+}
+
+// Returns 'added' | 'duplicate' | 'not-found' | 'queued' | 'error'.
 async function processWord(word) {
   try {
     const entry = await lookup(word);
@@ -40,6 +56,10 @@ async function processWord(word) {
     }
     return status;
   } catch (e) {
+    if (e instanceof AnkiError) {
+      badge('!', '#c62828', `Anki error for "${word}": ${e.message}`);
+      return 'error';
+    }
     const { pending = [] } = await chrome.storage.local.get('pending');
     if (!pending.includes(word)) await chrome.storage.local.set({ pending: [...pending, word] });
     badge('!', '#c62828', `Queued "${word}" (${e.message}). Is Anki open?`);

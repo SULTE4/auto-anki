@@ -2,18 +2,27 @@
 
 export const json = (body, status = 200) => new Response(JSON.stringify(body), { status });
 
-// Trimmed real response from api.dictionaryapi.dev for "ephemeral".
-export const EPHEMERAL = [{
-  word: 'ephemeral',
-  phonetic: '/əˈfɛm(ə)ɹəl/',
-  meanings: [
-    { partOfSpeech: 'adjective', definitions: [{ definition: 'Lasting for a short period of time.', example: 'an ephemeral fad' }] },
-    { partOfSpeech: 'noun', definitions: [{ definition: 'Something which lasts for a short period of time.' }] },
+// Trimmed real response from en.wiktionary.org/api/rest_v1/page/definition/ephemeral.
+export const EPHEMERAL = {
+  en: [
+    {
+      partOfSpeech: 'Adjective',
+      language: 'English',
+      definitions: [{
+        definition: 'Lasting for a <a rel="mw:WikiLink" href="/wiki/short" title="short">short</a> period of <a rel="mw:WikiLink" href="/wiki/time" title="time">time</a>.',
+        examples: ['an <b>ephemeral</b> fad'],
+      }],
+    },
+    {
+      partOfSpeech: 'Noun',
+      language: 'English',
+      definitions: [{ definition: 'Something which lasts for a <a rel="mw:WikiLink" href="/wiki/short" title="short">short</a> period of time.' }],
+    },
   ],
-}];
+};
 
 export function stubChrome() {
-  const calls = { badge: [], color: [], title: [], alarms: [] };
+  const calls = { badge: [], color: [], title: [], alarms: [], scripts: [] };
   const store = {};
   globalThis.chrome = {
     action: {
@@ -22,6 +31,7 @@ export function stubChrome() {
       setTitle: ({ title }) => calls.title.push(title),
     },
     alarms: { create: (name, info) => calls.alarms.push([name, info]) },
+    scripting: { executeScript: async injection => { calls.scripts.push(injection); return [{ result: undefined }]; } },
     storage: {
       local: {
         get: async key => (key in store ? { [key]: structuredClone(store[key]) } : {}),
@@ -32,14 +42,17 @@ export function stubChrome() {
   return { calls, store };
 }
 
-// dict(url) returns a Response; anki(action, params) returns the AnkiConnect reply body. Either may throw.
-export function stubFetch({ dict = () => json(EPHEMERAL), anki = () => ({ result: null, error: null }) } = {}) {
+// dict(url, init) returns a Response; anki(action, params) returns the AnkiConnect reply body. Either may throw.
+// AnkiConnect replies from a healthy Anki that already has our note type; `replies` overrides single actions.
+export const ankiOk = (replies = {}) => action => replies[action] ?? { result: action === 'modelNames' ? ['Auto Anki'] : 1, error: null };
+
+export function stubFetch({ dict = () => json(EPHEMERAL), anki = ankiOk() } = {}) {
   const dictUrls = [];
   const ankiRequests = [];
-  globalThis.fetch = async (url, init) => {
-    if (url.startsWith('https://api.dictionaryapi.dev/')) {
+  globalThis.fetch = async (url, init = {}) => {
+    if (url.startsWith('https://en.wiktionary.org/')) {
       dictUrls.push(url);
-      return dict(url);
+      return dict(url, init);
     }
     if (url === 'http://127.0.0.1:8765') {
       ankiRequests.push({ method: init.method, body: JSON.parse(init.body) });

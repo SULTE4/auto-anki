@@ -1,5 +1,5 @@
-// www.google.com, google.de, google.co.uk, google.com.br ...
-const GOOGLE_HOST = /^(www\.)?google\.[a-z]{2,3}(\.[a-z]{2})?$/;
+// shortcut: google.com only, because host permissions can't wildcard the TLD; add domains to manifest.json and here to support more
+const GOOGLE_HOST = /^(www\.)?google\.com$/;
 const QUOTE = `["'“”‘’]`;
 const WORD = `\\p{L}+(?:[-'’]\\p{L}+)*`;
 // "<word or up to 3-word phrase> meaning", quotes optional

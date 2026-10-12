@@ -54,14 +54,20 @@ test('ignores a missing q param', () => {
   assert.equal(extractWord('https://www.google.com/search?tbm=isch'), null);
 });
 
-test('accepts Google country domains, with or without www', () => {
-  for (const host of ['www.google.com', 'google.com', 'www.google.de', 'www.google.co.uk', 'www.google.com.br', 'www.google.kz']) {
+test('accepts google.com with or without www', () => {
+  for (const host of ['www.google.com', 'google.com', 'WWW.GOOGLE.COM']) {
     assert.equal(extractWord(`https://${host}/search?q=ephemeral+meaning`), 'ephemeral', host);
   }
 });
 
+test('ignores Google country domains (no host permission for them yet)', () => {
+  for (const host of ['www.google.de', 'www.google.co.uk', 'www.google.com.br', 'www.google.kz']) {
+    assert.equal(extractWord(`https://${host}/search?q=ephemeral+meaning`), null, host);
+  }
+});
+
 test('ignores non-Google hosts and lookalikes', () => {
-  for (const host of ['www.bing.com', 'duckduckgo.com', 'google.com.evil.com', 'evilgoogle.com', 'www.google.evil.com', 'mail.google.com']) {
+  for (const host of ['www.bing.com', 'duckduckgo.com', 'google.com.evil.com', 'evilgoogle.com', 'www.google.evil.com', 'mail.google.com', 'www.google.co']) {
     assert.equal(extractWord(`https://${host}/search?q=ephemeral+meaning`), null, host);
   }
 });
