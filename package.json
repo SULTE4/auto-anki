@@ -1,0 +1,11 @@
+{
+  "name": "auto-anki",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chrome extension that turns \"word meaning\" Google searches into Anki cards.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "MIT"
+}
