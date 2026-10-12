@@ -13,7 +13,7 @@ with definitions, part of speech and an example sentence.
 ![Tests](https://img.shields.io/badge/tests-node%3Atest-339933?logo=nodedotjs&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 
-<img src="docs/confirm-card.png" alt="Auto Anki confirm card on a Google results page: 'Add to Anki? ubiquitous (adjective) Being everywhere at once: omnipresent.' with an Add button" width="380">
+<img src="docs/confirm-card.png" alt="Auto Anki confirm card on a Google results page: 'Add to Anki? ubiquitous (adjective) Being everywhere at once: omnipresent.' with a deck dropdown and an Add button" width="380">
 
 </div>
 
@@ -38,9 +38,9 @@ You already look words up by googling them. Adding them to Anki by hand is the s
                 │
                 ▼
    "Add to Anki?" card on the results page
-                │  you click Add
+                │  you pick a deck and click Add
                 ▼
-   AnkiConnect (Anki desktop)  ──►  card in deck "Auto Anki"
+   AnkiConnect (Anki desktop)  ──►  card in the deck you picked
                 │  ~1 min later
                 ▼
    AnkiWeb sync  ──►  AnkiDroid / AnkiMobile / other computers
@@ -55,12 +55,13 @@ The Anki card looks like this:
 ## Features
 
 - **One click.** Search as you always do. A small card asks "Add to Anki?" and shows the definition, so you can decide. Ignore it or close it with ×, and nothing is added.
+- **Pick the deck.** A dropdown on the card lists your Anki decks. It starts on "Auto Anki" and then remembers the last deck you picked.
 - **Syncs everywhere.** Triggers an AnkiWeb sync about a minute after adding, batched so a burst of words syncs once.
 - **Never loses a word.** Anki closed or offline when you click Add? The word is queued and added automatically once Anki is back.
-- **No duplicates.** Adding a word that is already in the deck just says "Already in Anki".
+- **No duplicates.** Adding a word that is already in the chosen deck just says "Already in <deck>".
 - **Works with any Anki language.** Uses its own "Auto Anki" note type, created on first use. Your existing note types and decks are never touched.
 - **Private by design.** Only reads Google search URLs. No analytics, no accounts, no servers of its own.
-- **Tiny.** About 270 lines, zero dependencies, no build step.
+- **Tiny.** About 290 lines, zero dependencies, no build step.
 
 ## Quick start
 
@@ -80,7 +81,7 @@ git clone <this repo> auto-anki
 
 Open `chrome://extensions`, enable **Developer mode**, click **Load unpacked** and pick the `auto-anki` folder.
 
-**4. Try it.** With Anki open, google `ephemeral meaning`. The "Add to Anki?" card appears in the bottom right. Click **Add**, and the card is in the **Auto Anki** deck.
+**4. Try it.** With Anki open, google `ephemeral meaning`. The "Add to Anki?" card appears in the bottom right. Pick a deck (or keep **Auto Anki**) and click **Add**.
 
 ## What gets picked up
 
@@ -187,7 +188,7 @@ After changing the code, click the reload icon on the extension card in `chrome:
 
 - [ ] More query patterns: `define X`, `X definition`, `what does X mean`
 - [ ] Google country domains, Bing and DuckDuckGo
-- [ ] Popup with recent words and settings (deck name, on/off)
+- [ ] Popup with recent words and an on/off switch
 - [ ] Pronunciation and audio on the card
 - [ ] Other languages and translation cards
 - [ ] Extension icon

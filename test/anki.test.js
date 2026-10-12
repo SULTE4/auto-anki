@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { invoke, addWord, sync, AnkiError } from '../src/anki.js';
+import { invoke, addWord, deckNames, sync, AnkiError } from '../src/anki.js';
 import { stubFetch, ankiDown, ankiOk } from './helpers.js';
 
 const NOTE = {
@@ -77,6 +77,12 @@ test('addWord does not add the note when createDeck fails', async () => {
 test('addWord throws when Anki is not running', async () => {
   stubFetch({ anki: ankiDown });
   await assert.rejects(addWord('Auto Anki', 'ephemeral', 'x'), TypeError);
+});
+
+test('deckNames returns the decks from Anki', async () => {
+  const { ankiActions } = stubFetch({ anki: () => ({ result: ['Default', 'Английский'], error: null }) });
+  assert.deepEqual(await deckNames(), ['Default', 'Английский']);
+  assert.deepEqual(ankiActions(), ['deckNames']);
 });
 
 test('sync sends the sync action', async () => {

@@ -44,7 +44,8 @@ export function stubChrome() {
 
 // dict(url, init) returns a Response; anki(action, params) returns the AnkiConnect reply body. Either may throw.
 // AnkiConnect replies from a healthy Anki that already has our note type; `replies` overrides single actions.
-export const ankiOk = (replies = {}) => action => replies[action] ?? { result: action === 'modelNames' ? ['Auto Anki'] : 1, error: null };
+const OK_RESULTS = { modelNames: ['Auto Anki'], deckNames: ['Auto Anki', 'Default', 'English vocab'] };
+export const ankiOk = (replies = {}) => action => replies[action] ?? { result: OK_RESULTS[action] ?? 1, error: null };
 
 export function stubFetch({ dict = () => json(EPHEMERAL), anki = ankiOk() } = {}) {
   const dictUrls = [];

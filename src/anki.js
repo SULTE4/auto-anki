@@ -43,4 +43,5 @@ export async function addWord(deck, word, back) {
   }
 }
 
+export const deckNames = () => invoke('deckNames');
 export const sync = () => invoke('sync');
