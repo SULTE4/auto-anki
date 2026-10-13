@@ -76,7 +76,7 @@ Click `Sync` in Anki desktop and sign in.
 **3. Load the extension in Chrome**
 
 ```bash
-git clone <this repo> auto-anki
+git clone https://github.com/SULTE4/auto-anki.git
 ```
 
 Open `chrome://extensions`, enable **Developer mode**, click **Load unpacked** and pick the `auto-anki` folder.
